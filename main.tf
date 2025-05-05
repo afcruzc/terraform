@@ -1,3 +1,25 @@
+#### variables ######
+
+variable "ami_id" {
+  description = "ID de la AMI"
+  default     = "ami-084568db4383264d4"
+}
+
+variable "instance_type" {
+  description = "Tipo de instancia"
+  default     = "t3.micro"
+}
+
+variable "server_name" {
+  description = "Nombre de la instancia"
+  default     = "webserver"
+}
+
+variable "environment" {
+  description = "Ambiente en el que está deplegado (Prod - PreProd - Dev)"
+  default     = "Dev"
+}
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -9,8 +31,8 @@ data "aws_key_pair" "existing_key" {
 }
 
 resource "aws_instance" "nginx-server" {
-  ami               = "ami-084568db4383264d4"
-  instance_type     = "t3.micro"
+  ami               = var.ami_id
+  instance_type     = var.instance_type
   key_name          = data.aws_key_pair.existing_key.key_name
   availability_zone = "us-east-1a"
   user_data         = <<-EOF
@@ -23,9 +45,10 @@ resource "aws_instance" "nginx-server" {
                     EOF
 
   tags = {
-    Name    = "PruebaTF" # ¡Este es el nombre que aparecerá en la consola AWS!
-    Owner   = "andresc"  # Tags adicionales (opcionales)
-    Project = "Terraform-AWS"
+    Name        = var.server_name # ¡Este es el nombre que aparecerá en la consola AWS!
+    Environment = var.environment
+    Owner       = "andresc" # Tags adicionales (opcionales)
+    Project     = "Terraform-AWS"
   }
 
 }
